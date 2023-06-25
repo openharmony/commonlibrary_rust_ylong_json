@@ -238,6 +238,12 @@ fn output_json_text() {
 ```
 
 ## 编译构建
+若使用 GN 编译工具链, 在 BUILD.GN 的 deps 段下添加依赖。添加后使用 GN 进行编译和构建：
+
+```gn 
+deps += ["//example_path/ylong_json:lib"]
+```
+
 若使用 Cargo 编译工具链, 在 ```Cargo.toml``` 下添加依赖。添加后使用 ```cargo``` 进行编译和构建：
 
 ```toml
