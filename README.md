@@ -271,6 +271,12 @@ fn<V: Serialize> output_json_text(value: V) {
 ```
 
 ## Build
+`GN` is supported. User should add dependencies in `deps` of `BUILD.GN` to build this crate.
+
+```gn 
+deps += ["//example_path/ylong_json:lib"]
+```
+
 `Cargo` is supported. User should add dependencies in ```Cargo.toml``` to build this crate.
 
 ```toml
