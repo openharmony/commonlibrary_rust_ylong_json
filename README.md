@@ -48,14 +48,14 @@ ylong_json
 `GN` is supported. User should add dependencies in `deps` of `BUILD.GN` to build this crate.
 
 ```gn 
-deps += ["//example_path/ylong_json:lib"]
+deps += ["//commonlibrary/rust/ylong_json:lib"]
 ```
 
 `Cargo` is supported. User should add dependencies in ```Cargo.toml``` to build this crate.
 
 ```toml
 [dependencies]
-ylong_json = { path = "/example_path/ylong_json" } # Uses path dependencies.
+ylong_json = { path = "/commonlibrary/rust/ylong_json" } # Uses path dependencies.
 ```
 
 ## User Guide
