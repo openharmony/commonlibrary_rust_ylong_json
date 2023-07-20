@@ -48,14 +48,14 @@ ylong_json
 若使用 GN 编译工具链, 在 BUILD.GN 的 deps 段下添加依赖。添加后使用 GN 进行编译和构建：
 
 ```gn 
-deps += ["//example_path/ylong_json:lib"]
+deps += ["//commonlibrary/rust/ylong_json:lib"]
 ```
 
 若使用 Cargo 编译工具链, 在 ```Cargo.toml``` 下添加依赖。添加后使用 ```cargo``` 进行编译和构建：
 
 ```toml
 [dependencies]
-ylong_json = { path = "/example_path/ylong_json" } # 请使用路径依赖
+ylong_json = { path = "/commonlibrary/rust/ylong_json" } # 请使用路径依赖
 ```
 
 ## 用户指南
