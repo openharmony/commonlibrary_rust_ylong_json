@@ -38,6 +38,7 @@ ohos_rust_unittest("rust_ylong_json_unit_test") {
   module_out_path = "commonlibrary/rust/ylong_json"
   sources = [ "src/lib.rs" ]
   deps = [
+    ":lib",
     "//third_party/rust/crates/libc:lib",
     "//third_party/rust/crates/serde/serde:lib",
   ]
