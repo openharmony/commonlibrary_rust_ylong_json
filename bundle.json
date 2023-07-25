@@ -28,7 +28,7 @@
               "header_base": [],
               "header_files": []
             },
-            "name": "//commonlibrary/rust/commonlibrary_rust_ylong_json:lib"
+            "name": "//commonlibrary/rust/ylong_json:lib"
           }
         ],
         "test": []
