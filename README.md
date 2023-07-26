@@ -4,13 +4,13 @@
 The `ylong_json` module provides serialization of text or string in JSON syntax format and deserialization of corresponding generated instances.
 
 ### ylong_json in Openharmony
-![structure](./figure/ylong_json_oh_relate.png)
+![structure](./figures/ylong_json_oh_relate.png)
 Here is the description of the key fields in the figure above:
 - `ylong_json` : System component that provides json serialization and deserialization capabilities
 - `serde` : Third-party library for efficient and generic serialization and deserialization of Rust data structures.
 
 ### ylong_json Internal architecture diagram
-![structure](./figure/ylong_json_inner_structure.png)
+![structure](./figures/ylong_json_inner_structure.png)
 `ylong_json` is mainly divided into two modules, a module with a custom `JsonValue` structure type as the core and a module that ADAPTS to the third-party library `serde`.
 
 1. `JsonValue` is the internal custom structure type of `ylong_json`, and the serialization and deserialization function of `json` is built with this structure as the core.
@@ -28,8 +28,11 @@ Here is the description of the key fields in the figure above:
 ## Directory
 ```
 ylong_json
+├─ benches                                # Benche test files
+├─ docs                                   # Description documents
 ├─ examples                               # ylong_json code example
-├─ include                                # ylong_json.h
+├─ figures                                # ylong_json structure charts
+├─ patches                                # patches related information
 ├─ src
 │  ├─ value                               # Array and Object type definitions and related methods
 │  ├─ adapter.rs                          # Adapts to the C interface implementation

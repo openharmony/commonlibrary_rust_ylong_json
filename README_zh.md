@@ -4,13 +4,13 @@
 `ylong_json` 模块提供了 JSON 语法格式文本或字符串的序列化功能，以及对应生成实例的反序列化功能。
 
 ### ylong_json 在 Openharmony 中的位置
-![structure](./figure/ylong_json_oh_relate.png)
+![structure](./figures/ylong_json_oh_relate.png)
 以下是对于上图关键字段的描述信息：
 - `ylong_json`：提供 `json` 序列化与反序列化能力的系统组件
 - `serde`：第三方库，用于高效、通用地序列化和反序列化 `Rust` 数据结构。
 
 ### ylong_json 内部架构图
-![structure](./figure/ylong_json_inner_structure.png)
+![structure](./figures/ylong_json_inner_structure.png)
 `ylong_json` 内部主要分为两个模块，以自定义 `JsonValue` 类型为核心的模块和适配第三方库 `serde` 的模块。
 
 1. `JsonValue` 是 `ylong_json` 内部自定义的结构类型，以该结构为核心构建 `json` 的序列化与反序列化功能。
@@ -28,8 +28,11 @@
 ## 目录
 ```
 ylong_json
+├─ benches                                # benche 测试文件
+├─ docs                                   # 说明文档
 ├─ examples                               # ylong_json 代码示例
-├─ include                                # ylong_json.h
+├─ figures                                # ylong_json 架构图
+├─ patches                                # patches 相关信息
 ├─ src
 │  ├─ value                               # Array, Object 类型定义和相关方法实现
 │  ├─ adapter.rs                          # 适配 C 的接口实现
