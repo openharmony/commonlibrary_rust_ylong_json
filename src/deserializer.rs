@@ -108,8 +108,8 @@ where
 {
     let mut deserializer = Deserializer::new_from_io(reader);
     let t = T::deserialize(&mut deserializer)?;
-    match deserializer.reader.peek() {
-        Ok(None) => Ok(t),
+    match eat_whitespace_until_not!(deserializer) {
+        None => Ok(t),
         _ => Err(Error::Parsing(ParsingUnfinished)),
     }
 }
@@ -141,9 +141,11 @@ where
 {
     let mut deserializer = Deserializer::new_from_slice(slice);
     let t = T::deserialize(&mut deserializer)?;
-    match deserializer.reader.peek() {
-        Ok(None) => Ok(t),
-        _ => Err(Error::Parsing(ParsingUnfinished)),
+    match eat_whitespace_until_not!(deserializer) {
+        None => Ok(t),
+        _ => {
+            unexpected_character!(&mut deserializer)
+        }
     }
 }
 
@@ -415,7 +417,6 @@ where
         let peek_ch = match eat_whitespace_until_not!(self) {
             Some(ch) => ch,
             None => {
-                println!("arrive optin None branch");
                 return Err(Error::Parsing(ParsingUnfinished));
             }
         };
@@ -601,7 +602,9 @@ where
             }
             _ => {
                 if self.next_char()? == Some(b'{') {
+                    eat_whitespace_until_not!(self);
                     let value = visitor.visit_enum(EnumAssistant::new(self))?;
+                    eat_whitespace_until_not!(self);
 
                     if self.next_char()? == Some(b'}') {
                         Ok(value)
@@ -661,25 +664,36 @@ where
         T: DeserializeSeed<'de>,
     {
         let peek_ch = match eat_whitespace_until_not!(self.deserializer) {
-            Some(ch) => ch,
-            None => {
-                return Err(Error::Parsing(ParsingUnfinished));
+            Some(b']') => return Ok(None),
+            Some(b',') if !self.is_first => {
+                self.deserializer.discard_char();
+                eat_whitespace_until_not!(self.deserializer)
             }
+            Some(ch) => {
+                if self.is_first {
+                    self.is_first = false;
+                    Some(ch)
+                } else {
+                    let position = self.deserializer.reader.position();
+                    return Err(Error::Parsing(MissingComma(
+                        position.line(),
+                        position.column(),
+                    )));
+                }
+            }
+            None => return Err(Error::Parsing(ParsingUnfinished)),
         };
 
         match peek_ch {
-            b']' => Ok(None),
-            b',' if self.is_first => {
-                unexpected_character!(self.deserializer)
+            Some(b']') => {
+                let position = self.deserializer.reader.position();
+                Err(Error::Parsing(TrailingComma(
+                    position.line(),
+                    position.column(),
+                )))
             }
-            b',' => {
-                self.deserializer.discard_char();
-                Ok(Some(seed.deserialize(&mut *self.deserializer)?))
-            }
-            _ => {
-                self.is_first = false;
-                Ok(Some(seed.deserialize(&mut *self.deserializer)?))
-            }
+            Some(_) => Ok(Some(seed.deserialize(&mut *self.deserializer)?)),
+            None => Err(Error::Parsing(ParsingUnfinished)),
         }
     }
 }
@@ -689,30 +703,45 @@ where
     R: BytesReader + Cacheable,
 {
     type Error = Error;
+
     fn next_key_seed<K>(&mut self, seed: K) -> Result<Option<K::Value>, Error>
     where
         K: DeserializeSeed<'de>,
     {
         let peek_ch = match eat_whitespace_until_not!(self.deserializer) {
-            Some(ch) => ch,
+            Some(b'}') => return Ok(None),
+            Some(b',') if !self.is_first => {
+                self.deserializer.discard_char();
+                eat_whitespace_until_not!(self.deserializer)
+            }
+            Some(ch) => {
+                if self.is_first {
+                    self.is_first = false;
+                    Some(ch)
+                } else {
+                    let position = self.deserializer.reader.position();
+                    return Err(Error::Parsing(MissingComma(
+                        position.line(),
+                        position.column(),
+                    )));
+                }
+            }
             None => {
                 return Err(Error::Parsing(ParsingUnfinished));
             }
         };
 
         match peek_ch {
-            b'}' => Ok(None),
-            b',' if self.is_first => {
-                unexpected_character!(self.deserializer)
+            Some(b'"') => Ok(Some(seed.deserialize(&mut *self.deserializer)?)),
+            Some(b'}') => {
+                let position = self.deserializer.reader.position();
+                Err(Error::Parsing(TrailingComma(
+                    position.line(),
+                    position.column(),
+                )))
             }
-            b',' => {
-                self.deserializer.discard_char();
-                Ok(Some(seed.deserialize(&mut *self.deserializer)?))
-            }
-            _ => {
-                self.is_first = false;
-                Ok(Some(seed.deserialize(&mut *self.deserializer)?))
-            }
+            // Object key must be String.
+            _ => unexpected_character!(self.deserializer),
         }
     }
 
@@ -723,9 +752,16 @@ where
         match eat_whitespace_until_not!(self.deserializer) {
             Some(b':') => {
                 self.deserializer.discard_char();
+                eat_whitespace_until_not!(self.deserializer);
                 seed.deserialize(&mut *self.deserializer)
             }
-            Some(_ch) => unexpected_character!(self.deserializer),
+            Some(_ch) => {
+                let position = self.deserializer.reader.position();
+                Err(Error::Parsing(MissingColon(
+                    position.line(),
+                    position.column(),
+                )))
+            }
             None => Err(Error::Parsing(ParsingUnfinished)),
         }
     }
@@ -884,12 +920,24 @@ mod ut_test_for_deserializer {
         let expected: Vec<u8> = vec![1, 2, 3];
         assert_eq!(expected, from_slice::<Vec<u8>>(slice_seq).unwrap());
 
-        let slice_map = r#"{ true : 1 }"#.as_bytes();
+        let slice_map = r#"{ "apple" : 3 }"#.as_bytes();
         let mut expected = HashMap::new();
-        expected.insert(true, 1);
+        expected.insert("appple", 3);
         assert_eq!(
             expected,
-            from_slice::<HashMap<bool, i32>>(slice_map).unwrap()
+            crate::from_slice::<HashMap<&str, i32>>(slice_map).unwrap()
+        );
+    }
+
+    #[test]
+    fn de_map() {
+        use std::collections::HashMap;
+        let slice_map = r#"{ "apple" : 3 }"#.as_bytes();
+        let mut expected = HashMap::new();
+        expected.insert(String::from("apple"), 3);
+        assert_eq!(
+            expected,
+            from_slice::<HashMap<String, i32>>(slice_map).unwrap()
         );
     }
 
@@ -1024,8 +1072,41 @@ mod ut_test_for_deserializer {
         };
         assert_eq!(expected, from_str(str).unwrap());
 
+        let str = r#"{
+            "int" : 1 ,
+            "seq" : ["abcd" , "efgh" ], 
+            "tup" : [1, 2 ,3 ]
+        }"#;
+        let expected = Test {
+            int: 1,
+            seq: vec![String::from("abcd"), String::from("efgh")],
+            tup: (1, 2, 3),
+        };
+        assert_eq!(expected, from_str(str).unwrap());
+
         // The following is the test for abnormal input of JSON.
+        // Missing '}' at the end.
         let str_abnormal = r#"{"int":1,"seq":["abcd","efgh"],"tup":[1,2,3]"#;
+        let res = from_str::<Test>(str_abnormal);
+        assert!(res.is_err());
+
+        // Missing ','.
+        let str_abnormal = r#"{"int":1 "seq":["abcd","efgh"],"tup":[1,2,3]"#;
+        let res = from_str::<Test>(str_abnormal);
+        assert!(res.is_err());
+
+        // Trailing ','.
+        let str_abnormal = r#"{"int":1, "seq":["abcd","efgh",],"tup":[1,2,3]"#;
+        let res = from_str::<Test>(str_abnormal);
+        assert!(res.is_err());
+
+        // Missing ':'.
+        let str_abnormal = r#"{"int":1, "seq":["abcd","efgh"],"tup" [1,2,3]"#;
+        let res = from_str::<Test>(str_abnormal);
+        assert!(res.is_err());
+
+        // Incorrect field name.
+        let str_abnormal = r#"{"it":1, "sq" : ["abcd","efgh"],"tp": [1,2,3]"#;
         let res = from_str::<Test>(str_abnormal);
         assert!(res.is_err());
     }
