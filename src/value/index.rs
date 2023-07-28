@@ -215,7 +215,7 @@ impl Index for str {
     /// ```
     fn index_into_mut<'a>(&self, value: &'a mut JsonValue) -> &'a mut JsonValue {
         if let JsonValue::Object(ref mut object) = value {
-            #[cfg(any(feature = "list_object"))]
+            #[cfg(feature = "list_object")]
             {
                 return object.get_key_mut_maybe_insert(self);
             }
