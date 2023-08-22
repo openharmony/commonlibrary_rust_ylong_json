@@ -60,7 +60,6 @@ mod states;
 mod value;
 
 pub use error::{Error, ParseError};
-pub use serializer_compact::to_string;
 pub use value::{Array, Index, JsonValue, Number, Object};
 
 pub(crate) use encoder::{CompactEncoder, FormattedEncoder};
@@ -82,3 +81,4 @@ pub(crate) use linked_list::{Cursor, CursorMut, LinkedList};
 pub use linked_list::{Iter, IterMut, Node};
 
 pub use deserializer::{from_reader, from_slice, from_str};
+pub use serializer_compact::{to_string, to_writer};
