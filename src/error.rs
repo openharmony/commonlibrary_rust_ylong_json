@@ -61,6 +61,15 @@ pub enum ParseError {
 
     /// The input sequence has not yet been parsed.
     ParsingUnfinished,
+
+    /// There is an extra comma after the last value in an array or map (line number, character number)
+    TrailingComma(usize, usize),
+
+    /// A colon is missing (line number, character number)
+    MissingColon(usize, usize),
+
+    /// A comma is missing (line number, character number)
+    MissingComma(usize, usize),
 }
 
 impl Error {
@@ -100,6 +109,21 @@ impl Debug for ParseError {
             }
             Self::ParsingUnfinished => {
                 write!(f, "[Error]: Value has not been fully deserialized.")
+            }
+            Self::TrailingComma(line, pos) => {
+                write!(
+                    f,
+                    "[Line]: {line}, [Pos]: {pos}, [Error]: Has a comma after the last value in an array or map."
+                )
+            }
+            Self::MissingColon(line, pos) => {
+                write!(f, "[Line]: {line}, [Pos]: {pos}, [Error]: A colon is missing between key and value.")
+            }
+            Self::MissingComma(line, pos) => {
+                write!(
+                    f,
+                    "[Line]: {line}, [Pos]: {pos}, [Error]: A comma is missing before next value."
+                )
             }
         }
     }
