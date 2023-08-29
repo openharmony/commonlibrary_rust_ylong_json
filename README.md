@@ -48,17 +48,24 @@ ylong_json
 ```
 
 ## Build
-`GN` is supported. User should add dependencies in `deps` of `BUILD.GN` to build this crate.
-
-```gn 
-deps += ["//commonlibrary/rust/ylong_json:lib"]
-```
-
-`Cargo` is supported. User should add dependencies in ```Cargo.toml``` to build this crate.
-
+### Use Cargo 
+1. Add `ylong_json` to the dependency of `Cargo.toml`
 ```toml
 [dependencies]
-ylong_json = { path = "/commonlibrary/rust/ylong_json" } # Uses path dependencies.
+ylong_json = { git = "https://gitee.com/openharmony-sig/commonlibrary_rust_ylong_json.git" }
+```
+
+### Use gn
+1. Add `ylong_json` in `bundle.json`
+```gn 
+“deps”： {
+    “components”: ["ylong_json"]
+}
+```
+
+2. Add `ylong_json:lib` in `BUILD.gn`
+```gn 
+external_deps = ["ylong_json:lib"]
 ```
 
 ## User Guide

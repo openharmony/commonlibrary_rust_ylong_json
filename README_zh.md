@@ -48,17 +48,25 @@ ylong_json
 ```
 
 ## 编译构建
-若使用 GN 编译工具链, 在 BUILD.GN 的 deps 段下添加依赖。添加后使用 GN 进行编译和构建：
 
-```gn 
-deps += ["//commonlibrary/rust/ylong_json:lib"]
-```
-
-若使用 Cargo 编译工具链, 在 ```Cargo.toml``` 下添加依赖。添加后使用 ```cargo``` 进行编译和构建：
-
+### 使用 Cargo 编译 
+1. 在 `Cargo.toml` 的依赖中添加 `ylong_json`
 ```toml
 [dependencies]
-ylong_json = { path = "/commonlibrary/rust/ylong_json" } # 请使用路径依赖
+ylong_json = { git = "https://gitee.com/openharmony-sig/commonlibrary_rust_ylong_json.git" }
+```
+
+### 使用 GN 编译
+1. 在 `bundle.json` 中添加 `ylong_json`
+```gn 
+“deps”： {
+    “components”: ["ylong_json"]
+}
+```
+
+2. 在 `BUILD.gn` 中添加 `ylong_json:lib`
+```gn 
+external_deps = ["ylong_json:lib"]
 ```
 
 ## 用户指南
