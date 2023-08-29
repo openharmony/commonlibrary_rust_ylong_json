@@ -58,7 +58,7 @@ Note:If the text contains special characters, please escape them according to th
     <oatconfig>
         <filefilterlist>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies" >
-                <filteritem type="filename" name=".*.pem" desc="Testing of API for HTTPS configuration certificates requires a certificate input"/>
+                <filteritem typr="filename" name=".*.png" desc="png for json"/>
             </filefilter>
             <filefilter name="defaultPolicyFilter" desc="Filters for compatibility，license header policies">
                 <filteritem type="filename" name=".*.toml" desc="toml treats as readme file"/>
