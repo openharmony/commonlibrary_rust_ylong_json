@@ -1,30 +1,33 @@
 # ylong_json
 
 ## Introduction
-The `ylong_json` module provides serialization of text or string in JSON syntax format and deserialization of corresponding generated instances.
+`ylong_json` is a general `JSON` syntax parsing library that provides functions for converting `JSON` text to and from specific data structures.
 
-### ylong_json in Openharmony
+### ylong_json in OpenHarmony
 ![structure](./figures/ylong_json_oh_relate.png)
-Here is the description of the key fields in the figure above:
-- `ylong_json` : System component that provides json serialization and deserialization capabilities
-- `serde` : Third-party library for efficient and generic serialization and deserialization of Rust data structures.
+The following is a description of the key fields in the above figure:
+- `Application Layer`: The application layer provides specific functions to users.
+- `App`: Various applications need to use the functions of the system service layer.
+- `System Service Layer`: System service layer, which provides system services to upper-layer applications.
+- `system services`: Various system services require the use of `JSON` related functions.
+- `ylong_json`: System component, providing common `JSON` serialization and deserialization capabilities to related components of the system service layer.
+- `serde`: third-party library for efficient and versatile serialization and deserialization of `Rust` data structures.
 
 ### ylong_json Internal architecture diagram
 ![structure](./figures/ylong_json_inner_structure.png)
-`ylong_json` is mainly divided into two modules, a module with a custom `JsonValue` structure type as the core and a module that ADAPTS to the third-party library `serde`.
+`ylong_json` is mainly divided into three submodules: `JsonValue` submodule, `serde` submodule, and C-ffi submodule.
 
-1. `JsonValue` is the internal custom structure type of `ylong_json`, and the serialization and deserialization function of `json` is built with this structure as the core.
-- `JsonValue` : The core structure type, which stores the json content information, has 6 internal enum type variants.
-- `LinkedList`, `Vec`, `BTreeMap` : Three ways of storing data inside `Array` and `Object`, selected by `features`.
-- Serialization ability: Supports outputting a `JsonValue` instance as a compact strings or writing to the output stream.
-- Deserialization ability: Supports parsing `json` text or `json` content in the input stream and generating a `JsonValue` instance.
+The `JsonValue` submodule provides a basic data structure `JsonValue`.
+`JsonValue` supports serializing itself into `JSON` text in either indented or compact format. Any syntactically correct `JSON` text can also be deserialized into a corresponding `JsonValue` data structure.
+`JsonValue` supports addition, deletion, modification and query, and you can use the specified interface to change the data content in `JsonValue`.
+`JsonValue` supports all data types in `JSON` syntax: `null`, `boolean`, `number`, `string`, `array`, `object`, and implements all its functions according to `ECMA-404`.
+For `array` and `object` grammatical structures, `JsonValue` provides a variety of underlying data structures for different usage scenarios, for example, for `array` structures, it supports the underlying use of `Vec` or `LinkedList`, for `object` , supports the use of `Vec`, `LinkedList` or `Btree` as its underlying layer.
+On different underlying data structures, `array` and `object` will reflect different creation and query performance, for example, `object` based on `Btree` data structure has higher performance in query, `LinkedList` or `LinkedList` or `Vec` has high performance in terms of creation.
 
-2. `ylong_json` adapts to the third-party library `serde` 
-- `Serializer`: The auxiliary structure for serialization.
-- `Deserializer`: The auxiliary structure for deserialization.
-- Serialization ability: Supports for serializing a type instance that implements the `serde::Serialize` trait into `json` text content or writing the content to the output stream.
-- Deserialization ability: If the `json` content has the type that implements `serde::Deserialize` trait, then that part of the `json` content can be deserialized into an instance of that type.
+The `serde` submodule provides procedural macro functions based on the `Serialize` and `Deserialize` traits provided by the `serde` third-party library, which can support fast conversion of user structures and `JSON` text.
+The advantage of `serde` compared to `JsonValue` is that it is easy to use. Users do not need to convert the `JSON` text to `JsonValue` and then extract the specified data from it to generate the `Rust` structure. They only need to set `Serialize' to the structure. ` and `Deserialize` process macro tags can be used to serialize the interface structure provided in `ylong_json` into `JSON` text, or convert the corresponding `JSON` text into a user structure.
 
+The C-ffi module provides a C interface layer based on the `JsonValue` module, which facilitates users to use the C interface to call the functions of the `ylong_json` library.
 ## Directory
 ```
 ylong_json
@@ -72,40 +75,44 @@ external_deps = ["ylong_json:lib"]
 See [user_guide](./docs/user_guide.md)
 
 ## Performance test
+The following tests are from [`nativejson-benchmark`](https://www.github.com/miloyip/nativejson-benchmark)。
+
+The test environment information is as follows:
 ```
-1.Test environment
-OS: Linux
-Architecture: x86_64
-Byte Order: Little Endian
-Model number: Intel(R) Xeon(R) Gold 6278C CPU @ 2.60GHz
+OS: Ubuntu 7.3.-16ubuntu3
+Processor: Intel(R) Xeon(R) Gold 6278C CPU @ 2.60GHz
 CPU(s): 8
-MemTotal: 16G
-
-2.Test result
-| Serialize | ylong_json      | serde_json     |
-------------------------------------------------
-| null      | 150 ns/iter     | 175 ns/iter    |
-| boolean   | 155 ns/iter     | 178 ns/iter    |
-| number    | 309 ns/iter     | 291 ns/iter    |
-| string    | 513 ns/iter     | 413 ns/iter    |
-| array     | 998 ns/iter     | 1,075 ns/iter  |
-| object    | 1,333 ns/iter   | 1,348 ns/iter  |
-| example1  | 12,537 ns/iter  | 12,288 ns/iter |
-| example2  | 23,754 ns/iter  | 21,936 ns/iter |
-| example3  | 103,061 ns/iter | 97,247 ns/iter |
-| example4  | 15,234 ns/iter  | 17,895 ns/iter |
-
-| Deserialize | ylong_json      | serde_json     |
---------------------------------------------------
-| null        | 257 ns/iter     | 399 ns/iter    |
-| boolean     | 260 ns/iter     | 400 ns/iter    |
-| number      | 1,507 ns/iter   | 989 ns/iter    |
-| string      | 414 ns/iter     | 610 ns/iter    |
-| array       | 2,258 ns/iter   | 2,148 ns/iter  |
-| object      | 810 ns/iter     | 1,386 ns/iter  |
-| example1    | 10,191 ns/iter  | 10,227 ns/iter |
-| example2    | 15,753 ns/iter  | 18,022 ns/iter |
-| example3    | 55,910 ns/iter  | 59,717 ns/iter |
-| example4    | 18,461 ns/iter  | 12,471 ns/iter |
+Memory：8.0 G
 ```
 
+Software versions tested:
+
+cJSON 1.7.16
+
+Test Results:
+```
+======= ylong-json ==== parse | stringify ====
+canada.json            200 MB/s  90 MB/s 
+citm_catalog.json      450 MB/s  300 MB/s 
+twitter.json           340 MB/s  520 MB/s
+
+======== cJSON ======== parse | stringify ====
+canada.json            55 MB/s    11 MB/s 
+citm_catalog.json      260 MB/s   170 MB/s 
+twitter.json           210 MB/s   210 MB/s
+```
+
+Description of test results:
+
+Three test files are provided in the `nativejson-benchmark` test. Among them, `canada.json` contains a large number of `number` structures, the various data types of `citm_catalog.json` are relatively average, and `twitter.json` exists Various `UTF-8` characters.
+To ensure test fairness, `ylong_json` enables `list_object`, `list_array` and `ascii_only` feature.
+The `list_object` and `list_array` features are mainly to ensure consistency with the `cJSON` data structure, and both are implemented using linked lists.
+`ascii_only` feature is to ensure consistent processing logic for `UTF-8` characters, `cJSON` does not handle UTF-8 characters.
+
+The testing process is as follows:
+- Read the content of the file into the memory, and get the content of the file `content`.
+- Call the specified `JSON` library deserialization interface to generate the corresponding `JSON` structure `data`.
+- Call the serialization interface of the `JSON` structure to generate the output content `result`.
+- Using `content`, loop deserialization generates `JSON` structure 100 times, taking the smallest processing time `t1`.
+- Using `data`, serialize and generate `JSON` text 100 times, taking the smallest processing time `t2`.
+- Calculate the parsing speed, the deserialization time is the length of `content` divided by `t1`, and the serialization time is the length of the `JSON` text divided by `t2`.
