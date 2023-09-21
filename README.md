@@ -35,7 +35,6 @@ ylong_json
 ├─ docs                                   # Description documents
 ├─ examples                               # ylong_json code example
 ├─ figures                                # ylong_json structure charts
-├─ patches                                # patches related information
 ├─ src
 │  ├─ value                               # Array and Object type definitions and related methods
 │  ├─ adapter.rs                          # Adapts to the C interface implementation
