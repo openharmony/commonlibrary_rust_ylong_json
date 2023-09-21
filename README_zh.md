@@ -36,7 +36,6 @@ ylong_json
 ├─ docs                                   # 说明文档
 ├─ examples                               # ylong_json 代码示例
 ├─ figures                                # ylong_json 架构图
-├─ patches                                # patches 相关信息
 ├─ src
 │  ├─ value                               # Array, Object 类型定义和相关方法实现
 │  ├─ adapter.rs                          # 适配 C 的接口实现
