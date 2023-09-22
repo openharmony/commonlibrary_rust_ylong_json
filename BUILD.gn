@@ -31,7 +31,7 @@ ohos_rust_shared_library("lib") {
     "default",
     "vec_array",
     "btree_object",
-    "c_adapter",
+    "ascii_only",
   ]
 }
 
@@ -48,6 +48,6 @@ ohos_rust_unittest("rust_ylong_json_unit_test") {
     "--cfg=feature=\"default\"",
     "--cfg=feature=\"vec_array\"",
     "--cfg=feature=\"btree_object\"",
-    "--cfg=feature=\"c_adapter\"",
+    "--cfg=feature=\"ascii_only\"",
   ]
 }
