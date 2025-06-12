@@ -922,10 +922,10 @@ mod ut_test_for_deserializer {
 
         let slice_map = r#"{ "apple" : 3 }"#.as_bytes();
         let mut expected = HashMap::new();
-        expected.insert("appple", 3);
+        expected.insert(String::from("apple"), 3);
         assert_eq!(
             expected,
-            crate::from_slice::<HashMap<&str, i32>>(slice_map).unwrap()
+            crate::from_slice::<HashMap<String, i32>>(slice_map).unwrap()
         );
     }
 
