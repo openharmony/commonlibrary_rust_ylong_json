@@ -800,20 +800,20 @@ mod ut_states {
         assert!(parse_string(&mut deserializer).is_err());
 
         // 3.A backslash is followed by a terminator.
-        let str = r#"\"#;
+        let str = r"\";
         let mut deserializer = Deserializer::new_from_slice(str.as_bytes());
         assert!(parse_string(&mut deserializer).is_err());
 
         // 4.Illegal unicode characters.
-        let str = r#"\uBEEF"#;
+        let str = r"\uBEEF";
         let mut deserializer = Deserializer::new_from_slice(str.as_bytes());
         assert!(parse_string(&mut deserializer).is_err());
 
-        let str = r#"\uZ000"#;
+        let str = r"\uZ000";
         let mut deserializer = Deserializer::new_from_slice(str.as_bytes());
         assert!(parse_string(&mut deserializer).is_err());
 
-        let str = r#"\u"#;
+        let str = r"\u";
         let mut deserializer = Deserializer::new_from_slice(str.as_bytes());
         assert!(parse_string(&mut deserializer).is_err());
 
