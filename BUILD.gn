@@ -23,10 +23,18 @@ ohos_rust_shared_library("lib") {
   part_name = "ylong_json"
 
   sources = [ "src/lib.rs" ]
+
   deps = [
-    "//third_party/rust/crates/libc:lib",
     "//third_party/rust/crates/serde/serde:lib",
   ]
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.third_party_rust_libc)) {
+    deps += [ "//third_party/rust/crates/libc:lib" ]
+  } else {
+    external_deps += [ "rust_libc:lib" ]
+  }
+
   features = [
     "default",
     "vec_array",
@@ -36,13 +44,26 @@ ohos_rust_shared_library("lib") {
 }
 
 ohos_rust_unittest("rust_ylong_json_unit_test") {
-  module_out_path = "commonlibrary/rust/ylong_json"
+  module_out_path = "ylong_json/ylong_json"
   sources = [ "src/lib.rs" ]
   deps = [
     ":lib",
-    "//third_party/rust/crates/libc:lib",
     "//third_party/rust/crates/serde/serde:lib",
   ]
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.third_party_rust_libc)) {
+    deps += [ "//third_party/rust/crates/libc:lib" ]
+  } else {
+    external_deps += [ "rust_libc:lib" ]
+  }
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.third_party_rust_serde)) {
+    deps += [ "//third_party/rust/crates/serde/serde:lib" ]
+  } else {
+    external_deps += [ "rust_serde:lib" ]
+  }
 
   rustflags = [
     "--cfg=feature=\"default\"",
@@ -50,4 +71,12 @@ ohos_rust_unittest("rust_ylong_json_unit_test") {
     "--cfg=feature=\"btree_object\"",
     "--cfg=feature=\"ascii_only\"",
   ]
+}
+
+group("unittest") {
+  testonly = true
+  deps = []
+  if (!use_clang_coverage) {
+    deps += [ ":rust_ylong_json_unit_test" ]
+  }
 }

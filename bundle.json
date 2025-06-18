@@ -25,7 +25,12 @@
     ],
     "rom": "200KB",
     "ram": "~200KB",
-    "deps": {},
+    "deps": {
+      "components": [
+        "rust_libc"
+      ],
+      "third_party": []
+    },
     "build": {
       "sub_component": [],
       "inner_kits": [
@@ -37,7 +42,9 @@
           "name": "//commonlibrary/rust/ylong_json:lib"
         }
       ],
-      "test": []
+      "test": [
+        "//commonlibrary/rust/ylong_json:unittest"
+      ]
     }
   }
 }
