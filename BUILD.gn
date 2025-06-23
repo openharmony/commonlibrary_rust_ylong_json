@@ -24,16 +24,9 @@ ohos_rust_shared_library("lib") {
 
   sources = [ "src/lib.rs" ]
 
-  deps = [
-    "//third_party/rust/crates/serde/serde:lib",
-  ]
+  deps = [ "//third_party/rust/crates/serde/serde:lib" ]
 
-  if (defined(global_parts_info) &&
-      !defined(global_parts_info.third_party_rust_libc)) {
-    deps += [ "//third_party/rust/crates/libc:lib" ]
-  } else {
-    external_deps += [ "rust_libc:lib" ]
-  }
+  external_deps += [ "rust_libc:lib" ]
 
   features = [
     "default",
@@ -51,12 +44,7 @@ ohos_rust_unittest("rust_ylong_json_unit_test") {
     "//third_party/rust/crates/serde/serde:lib",
   ]
 
-  if (defined(global_parts_info) &&
-      !defined(global_parts_info.third_party_rust_libc)) {
-    deps += [ "//third_party/rust/crates/libc:lib" ]
-  } else {
-    external_deps += [ "rust_libc:lib" ]
-  }
+  external_deps += [ "rust_libc:lib" ]
 
   if (defined(global_parts_info) &&
       !defined(global_parts_info.third_party_rust_serde)) {
