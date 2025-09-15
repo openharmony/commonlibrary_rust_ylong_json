@@ -54,7 +54,7 @@ ylong_json
 1. Add `ylong_json` to the dependency of `Cargo.toml`
 ```toml
 [dependencies]
-ylong_json = { git = "https://gitee.com/openharmony-sig/commonlibrary_rust_ylong_json.git" }
+ylong_json = { git = "https://gitcode.com/openharmony-sig/commonlibrary_rust_ylong_json.git" }
 ```
 
 ### Use gn
