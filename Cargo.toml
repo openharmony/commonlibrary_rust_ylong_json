@@ -5,7 +5,7 @@ edition = "2021"
 description = "A JSON serialization file format"
 #readme = "README.md"
 license = "Apache-2.0"
-repository = "https://gitee.com/openharmony-sig/commonlibrary_rust_ylong_json"
+repository = "https://gitcode.com/openharmony-sig/commonlibrary_rust_ylong_json"
 keywords = ["ylong", "json", "serialization", "deserialization"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
