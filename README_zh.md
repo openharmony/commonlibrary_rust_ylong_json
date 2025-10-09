@@ -56,7 +56,7 @@ ylong_json
 1. 在 `Cargo.toml` 的依赖中添加 `ylong_json`
 ```toml
 [dependencies]
-ylong_json = { git = "https://gitee.com/openharmony-sig/commonlibrary_rust_ylong_json.git" }
+ylong_json = { git = "https://gitcode.com/openharmony-sig/commonlibrary_rust_ylong_json.git" }
 ```
 
 ### 使用 GN 编译
